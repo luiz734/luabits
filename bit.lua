@@ -14,6 +14,20 @@ function Bit:__tostring(t)
     -- return inspect(self)
 end
 
+function Bit:__add(other)
+    local wrap_sum = (self.as_decimal + other.as_decimal) % 256
+    return Bit:from_decimal(wrap_sum)
+end
+
+function Bit:__sub(other)
+    local wrap_sum = (self.as_decimal - other.as_decimal)
+    if wrap_sum < 0 then
+        wrap_sum = 256 + wrap_sum
+    end
+    print(wrap_sum)
+    return Bit:from_decimal(wrap_sum)
+end
+
 function Bit:from_bits(bits)
     assert(type(bits) == "table", "expected table, got " .. type(bits))
     assert(#bits <= 8 and #bits >= 0, string.format("invalid size %s: min=0, max=8", #bits))
@@ -130,10 +144,7 @@ function Bit:b_shiftR(amount)
     return Bit:from_string(shifted:reverse())
 end
 
-local a = Bit:from_decimal(27)
-local b = Bit:from_bits({1, 1, 0, 1, 1, 1, 1, 1})
-print(a)
--- a:b_shiftL(1)
--- print(a)
-a = a:b_shiftR(2)
-print(a)
+local a = Bit:from_decimal(0)
+local b = Bit:from_decimal(1)
+local c = a - b
+print(c.as_decimal)
