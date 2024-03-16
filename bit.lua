@@ -10,8 +10,8 @@ Bit = {
 }
 
 function Bit:__tostring(t)
-    -- return self.as_bits_str
-    return inspect(self)
+    return self.as_bits_str
+    -- return inspect(self)
 end
 
 function Bit:from_bits(bits)
@@ -64,10 +64,6 @@ function Bit:from_decimal(decimal)
     assert(tonumber(tostring(decimal), 10), "invalid type: should be integer")
     assert(decimal >= 0 and decimal < 256, "invalid range: use [0,255]")
 
-    local o = {
-        as_decimal = decimal
-    }
-
     local bits = {}
     for _ = 1, 8 do
         table.insert(bits, 0)
@@ -83,60 +79,61 @@ function Bit:from_decimal(decimal)
     if #bits == 0 then
         table.insert(bits, 0)
     end
-    o.as_bits = bits
 
-    o.as_bits_str = ""
-    for _, b in ipairs(bits) do
-        o.as_bits_str = o.as_bits_str .. tostring(b)
-    end
-
-    setmetatable(o, self)
-    self.__index = self
-    return o
+    return Bit:from_bits(bits)
 end
 
 function Bit:print_bits()
     print(self.as_bits)
 end
 
--- function Bit:and(other)
---     local output
--- end
+function Bit:b_and(other)
+    local a = self.as_decimal
+    local b = other.as_decimal
+    local a_and_b = a&b
+    return Bit:from_decimal(a_and_b)
+end
 
-local a = Bit:from_decimal(4)
+function Bit:b_or(other)
+    local a = self.as_decimal
+    local b = other.as_decimal
+    local a_and_b = a|b
+    return Bit:from_decimal(a_and_b)
+end
+
+function Bit:b_xor(other)
+    local a = self.as_decimal
+    local b = other.as_decimal
+    local a_and_b = a~b
+    return Bit:from_decimal(a_and_b)
+end
+
+function Bit:b_not()
+    local copy = {}
+    for i=1, #self.as_bits do
+        table.insert(copy, 1 - self.as_bits[i])
+    end
+    return Bit:from_bits(copy)
+end
+
+function Bit:b_shiftL(amount)
+    local copy_str = self.as_bits_str
+    local shifted = string.sub(copy_str, amount + 1, 8)
+    shifted = shifted .. string.rep("0", 8 - #shifted)
+    return Bit:from_string(shifted)
+end
+
+function Bit:b_shiftR(amount)
+    local copy_str = self.as_bits_str:reverse()
+    local shifted = string.sub(copy_str, amount + 1, 8)
+    shifted = shifted .. string.rep("0", 8 - #shifted)
+    return Bit:from_string(shifted:reverse())
+end
+
+local a = Bit:from_decimal(27)
 local b = Bit:from_bits({1, 1, 0, 1, 1, 1, 1, 1})
-local c = Bit:from_string("11111111")
 print(a)
-print(b)
-print(c)
-
--- local function bits_to_decimal(bits)
---     return result
--- end
--- assert(bits_to_decimal{1, 1, 1, 1} == 15)
--- assert(bits_to_decimal{0, 0, 0, 0} == 0)
--- assert(bits_to_decimal{1, 1, 0, 0} == 12)
--- assert(bits_to_decimal{1, 0, 1, 1} == 11)
---
--- local function sample_bits(bits, amount)
---     assert(amount <= #bits)
---     local out = {}
---     for i=1, amount do
---         out[i] = bits[i]
---     end
---     return out
--- end
---
--- local function mask_bits(bits, mask)
---     -- local bits_decimal = bits_to_decimal(bits)
---     return tonumber(mask & bits)
--- end
---
--- local a = {1, 1, 0, 1}
--- local b = {1, 0, 0, 1}
---
--- local x1 = mask_bits(10, 2)
--- print(x1)
---
---
---
+-- a:b_shiftL(1)
+-- print(a)
+a = a:b_shiftR(2)
+print(a)
