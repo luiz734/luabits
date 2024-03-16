@@ -1,9 +1,4 @@
-local inspect = require 'inspect'
-show = function (x)
-   print(inspect(x))
-end
-
-Bit = {
+local Bit = {
     as_decimal = 0,
     as_bits_str = "",
     as_bits = {},
@@ -37,7 +32,7 @@ function Bit:from_bits(bits)
         table.insert(bits_with_zeros, 0)
     end
 
-    for i=1, #bits do
+    for i = 1, #bits do
         local bit = bits[8 - #bits_with_zeros + i]
         assert(bit == 1 or bit == 0, "expected binary, got " .. bit)
         bits_with_zeros[i] = bit
@@ -47,7 +42,7 @@ function Bit:from_bits(bits)
     }
 
     local result = 0
-    for i=1, #bits_with_zeros do
+    for i = 1, #bits_with_zeros do
         local bit_value = tonumber(bits_with_zeros[i])
         local decimal_value = bit_value << (#bits_with_zeros - i)
         result = result + decimal_value
@@ -67,7 +62,7 @@ end
 
 function Bit:from_string(str)
     local as_bits = {}
-    for i=1, #str do
+    for i = 1, #str do
         table.insert(as_bits, tonumber(str:sub(i, i)))
     end
     return Bit:from_bits(as_bits)
@@ -104,7 +99,7 @@ end
 function Bit:b_and(other)
     local a = self.as_decimal
     local b = other.as_decimal
-    local a_and_b = a&b
+    local a_and_b = a & b
     return Bit:from_decimal(a_and_b)
 end
 
@@ -118,13 +113,13 @@ end
 function Bit:b_xor(other)
     local a = self.as_decimal
     local b = other.as_decimal
-    local a_and_b = a~b
+    local a_and_b = a ~ b
     return Bit:from_decimal(a_and_b)
 end
 
 function Bit:b_not()
     local copy = {}
-    for i=1, #self.as_bits do
+    for i = 1, #self.as_bits do
         table.insert(copy, 1 - self.as_bits[i])
     end
     return Bit:from_bits(copy)
@@ -144,7 +139,4 @@ function Bit:b_shiftR(amount)
     return Bit:from_string(shifted:reverse())
 end
 
-local a = Bit:from_decimal(0)
-local b = Bit:from_decimal(1)
-local c = a - b
-print(c.as_decimal)
+return Bit
